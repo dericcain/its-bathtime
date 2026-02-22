@@ -1,42 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;600;800&display=swap');
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --comic-yellow: #f2e32e;
+  --comic-red: #d92525;
+  --comic-blue: #2a62a6;
+  --comic-black: #1a1a1a;
+  --comic-white: #ffffff;
+  --halftone: radial-gradient(circle, var(--comic-black) 10%, transparent 11%),
+              radial-gradient(circle, var(--comic-black) 10%, transparent 11%);
+  --halftone-size: 8px 8px;
+  --halftone-position: 0 0, 4px 4px;
 }
 
 * {
   box-sizing: border-box;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--comic-yellow);
+  background-image: var(--halftone);
+  background-size: var(--halftone-size);
+  background-position: var(--halftone-position);
+  color: var(--comic-black);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+h1, h2, h3, h4, .comic-font {
+  font-family: 'Bangers', cursive;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.action-text {
+  font-family: 'Bangers', cursive;
+  font-size: 3rem;
+  color: var(--comic-red);
+  text-shadow: 4px 4px 0px var(--comic-black), -2px -2px 0 var(--comic-yellow);
+  transform: rotate(-5deg);
+  display: inline-block;
+}
+
+.panel {
+  background: var(--comic-white);
+  border: 4px solid var(--comic-black);
+  box-shadow: 6px 6px 0px var(--comic-black);
+  padding: 1.5rem;
+  margin: 1rem;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.panel:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0px var(--comic-black);
+}
+
+.button, button {
+  font-family: 'Bangers', cursive;
+  font-size: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--comic-blue);
+  color: var(--comic-white);
+  border: 4px solid var(--comic-black);
+  box-shadow: 4px 4px 0px var(--comic-black);
+  cursor: pointer;
+  text-transform: uppercase;
+  border-radius: 4px;
+  transition: all 0.1s ease-in-out;
+}
+
+.button:active, button:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px var(--comic-black);
+}
+
+.button-red, button.red {
+  background-color: var(--comic-red);
+}
+
+.button-yellow, button.yellow {
+  background-color: var(--comic-yellow);
+  color: var(--comic-black);
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.75rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 3px solid var(--comic-black);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.input-field:focus {
+  outline: none;
+  background-color: #fdfdfd;
+  box-shadow: 4px 4px 0px var(--comic-blue);
+}
+
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 2rem 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Specific elements */
+.avatar-preview {
+  width: 100px;
+  height: 100px;
+  border: 4px solid var(--comic-black);
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #eee;
+}
+
+.lucky-dice {
+  font-size: 2rem;
 }

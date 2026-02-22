@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# It's Bathtime! 🦇🛁
 
-## Getting Started
+A production-ready Next.js App Router PWA built to track your kids' bathtime order, complete with a classic superhero comic-book aesthetic!
 
-First, run the development server:
+## Features 🚀
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Local Data Only**: All session data, kids profiles, and avatars are stored strictly locally in your browser leveraging IndexedDB (`Dexie.js`). No data leaves your device.
+- **Fair Rotation System**: Rotates who gets to go first and who has to go last automatically!
+- **"I'm feeling lucky" 🎲**: Allows the kid in the 2nd position to scramble the order, injecting a little chaos into bathtime.
+- **Kid Management**: Add robust team rosters with avatar picture uploads and cropping support.
+- **Statistics**: Dive deep into historical data with stacked bar charts and tabular leaderboards (`Recharts`).
+- **Progressive Web App (PWA)**: Installable on Mobile/Desktop, offline support, powered by `@ducanh2912/next-pwa`.
+- **Comic-Book Aesthetic**: Vibrant halftones, action sound-texts (POW/BAM/SPLASH), heavy borders, and thick shadows.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack 🛠️
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- [Next.js](https://nextjs.org/) (App Router, React 18)
+- [Dexie.js](https://dexie.org/) & `dexie-react-hooks` (Simplified IndexedDB)
+- [Recharts](https://recharts.org/) (Data Visualization)
+- [React Easy Crop](https://www.npmjs.com/package/react-easy-crop) (Avatar Cropping)
+- Vanilla CSS (Custom design system inside `globals.css` with no Tailwind)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Setup & Run Locally 💻
 
-## Learn More
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Run the development server**:
+   ```bash
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Open the browser**:
+   Navigate to [http://localhost:3000](http://localhost:3000).
+   *Note: In development, PWA service workers and caching are disabled to make debugging easier.*
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment to Vercel ☁️
 
-## Deploy on Vercel
+This Next.js app is pre-configured and 100% deployable to Vercel without a database (IndexedDB runs on the client end).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Push your repository to GitHub/GitLab/Bitbucket.
+2. Go to [Vercel](https://vercel.com/) -> Add New Project.
+3. Import your repository. Vercel automatically detects Next.js settings.
+4. Click **Deploy**. The Next-PWA plugin will correctly generate service workers for the production build.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## How to Use 🦸‍♂️
+
+1. Head to the **Kids** tab to enlist at least 2 Sidekicks. Upload their photos and crop them to make avatars!
+2. Go to the **Bathtime** tab. 
+3. If feeling lucky, the #2 kid can press the **Dice icon** to randomize the current roster limit. 
+4. Once everyone is clean, hit **"Baths Done"** to log the session. The order automatically rotates for tomorrow!
+5. View the leaderboards under the **Stats** tab.
