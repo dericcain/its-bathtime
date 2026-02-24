@@ -32,7 +32,7 @@ export default function RootLayout({
             <Logo />
             <Navigation />
           </header>
-          <main style={{ width: "100%", flex: 1, display: "flex", flexDirection: "column" }}>
+          <main className="app-main">
             {children}
           </main>
         </div>

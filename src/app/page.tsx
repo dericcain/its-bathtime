@@ -121,28 +121,28 @@ export default function Home() {
         POW!
       </div>
       
-      <div style={{ width: "100%", maxWidth: "600px", display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <div className="home-list">
           {currentOrder.map((kid, index) => {
             const isSecond = index === 1;
             const canRoll = isSecond && !luckyUsed;
             
             return (
-              <div key={kid.id} className="panel" style={{ display: "flex", alignItems: "center", gap: "1rem", backgroundColor: "white" }}>
-                <div className="comic-font" style={{ backgroundColor: "var(--comic-red)", color: "white", padding: "10px 20px", borderRadius: "50%", fontSize: "2rem", border: "3px solid black", transform: "rotate(-5deg)" }}>
+              <div key={kid.id} className="panel kid-order-card">
+                <div className="comic-font kid-rank">
                     #{index + 1}
                 </div>
                 {kid.avatarBlob ? (
-                    <img src={URL.createObjectURL(kid.avatarBlob)} alt={kid.name} className="avatar-preview" />
+                    <img src={URL.createObjectURL(kid.avatarBlob)} alt={kid.name} className="avatar-preview" style={{ flex: "0 0 auto" }} />
                 ) : (
-                    <div className="avatar-preview" style={{width: '60px', height: '60px', borderWidth: '3px'}}></div>
+                    <div className="avatar-preview" style={{ width: "72px", height: "72px", borderWidth: "3px", flex: "0 0 auto" }} />
                 )}
                 
-                <h3 style={{ flex: 1, margin: 0, fontSize: "2.5rem", color: "var(--comic-blue)", textShadow: "2px 2px 0 var(--comic-yellow)" }}>
+                <h3 className="kid-name">
                     {kid.name}
                 </h3>
                 
                 {canRoll && (
-                    <button className="button button-yellow" style={{ padding: "1rem", borderRadius: "50%" }} onClick={() => handleLucky(kid.id)}>
+                    <button className="button button-yellow icon-circle-btn" onClick={() => handleLucky(kid.id)} aria-label={`Lucky splash for ${kid.name}`}>
                         <Dices size={32} />
                     </button>
                 )}
@@ -152,8 +152,7 @@ export default function Home() {
       </div>
       
       <button 
-        className="button button-red" 
-        style={{ fontSize: "2rem", padding: "1rem 2rem", display: "flex", alignItems: "center", gap: "1rem" }}
+        className="button button-red hero-cta"
         onClick={handleLogSession}
       >
           <CheckCircle size={32} />

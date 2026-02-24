@@ -80,11 +80,11 @@ export default function KidsPage() {
   };
 
   return (
-    <div className="panel" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div className="panel" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
       <h2 style={{ textAlign: "center" }}>Manage Kids</h2>
 
       {/* Form */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "1rem", backgroundColor: "#f9f9f9", padding: "1rem", border: "3px solid var(--comic-black)", borderRadius: "8px" }}>
+      <div className="kids-form-card">
         <h3>{editingId ? "Edit Kid" : "Add New Kid"}</h3>
         <input
           className="input-field"
@@ -130,7 +130,7 @@ export default function KidsPage() {
         )}
 
         {/* Action Buttons */}
-        <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+        <div className="kids-form-actions">
           <button className="button" onClick={saveKid}>
             {editingId ? "Update" : "Add to Team!"}
           </button>
@@ -152,7 +152,7 @@ export default function KidsPage() {
         <h3>Current Team</h3>
         {kids.length === 0 && <p>No kids added yet. Must add at least 2 kids!</p>}
         {kids.map((kid) => (
-          <div key={kid.id} style={{ display: "flex", alignItems: "center", gap: "1rem", background: "white", padding: "1rem", border: "4px solid black", borderRadius: "8px", boxShadow: "4px 4px 0 black" }}>
+          <div key={kid.id} className="kids-row">
             {kid.avatarBlob ? (
               <img src={URL.createObjectURL(kid.avatarBlob)} alt={kid.name} className="avatar-preview" style={{width: '60px', height: '60px', borderWidth: '3px'}} />
             ) : (
@@ -160,15 +160,17 @@ export default function KidsPage() {
                 <Camera size={24} />
               </div>
             )}
-            <div style={{ flex: 1 }}>
-              <h4 style={{ fontSize: "1.5rem", margin: 0 }}>{kid.name}</h4>
+            <div className="kids-row-name">
+              <h4>{kid.name}</h4>
             </div>
-            <button className="button button-yellow" style={{ padding: "0.5rem 1rem" }} onClick={() => editKid(kid)}>
-              <Edit2 size={20} />
-            </button>
-            <button className="button button-red" style={{ padding: "0.5rem 1rem" }} onClick={() => deleteKid(kid.id)}>
-              <Trash2 size={20} />
-            </button>
+            <div className="kids-row-actions">
+              <button className="button button-yellow" style={{ padding: "0.5rem 0.9rem" }} onClick={() => editKid(kid)} aria-label={`Edit ${kid.name}`}>
+                <Edit2 size={20} />
+              </button>
+              <button className="button button-red" style={{ padding: "0.5rem 0.9rem" }} onClick={() => deleteKid(kid.id)} aria-label={`Delete ${kid.name}`}>
+                <Trash2 size={20} />
+              </button>
+            </div>
           </div>
         ))}
       </div>

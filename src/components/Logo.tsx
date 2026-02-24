@@ -1,11 +1,11 @@
 export default function Logo() {
   return (
-    <div style={{ display: "flex", justifyContent: "center", width: "100%", margin: "2rem 0" }}>
+    <div className="logo-wrap">
       <svg
         viewBox="0 0 500 200"
         width="100%"
         height="100%"
-        style={{ maxWidth: "400px" }}
+        className="logo-svg"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
