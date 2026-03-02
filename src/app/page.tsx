@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { AlertTriangle, CheckCircle, Dices } from "lucide-react";
+import { AlertTriangle, CheckCircle, ChevronDown, ChevronUp, Dices } from "lucide-react";
 import { useEffect, useState } from "react";
 
 // Fisher-Yates shuffle
@@ -22,6 +22,7 @@ export default function Home() {
   const [currentOrder, setCurrentOrder] = useState<any[]>([]);
   const [luckyUsed, setLuckyUsed] = useState(false);
   const [luckyByKidId, setLuckyByKidId] = useState<string | undefined>();
+  const [manuallyReordered, setManuallyReordered] = useState(false);
   
   // Calculate default order
   useEffect(() => {
@@ -34,6 +35,8 @@ export default function Home() {
         setCurrentOrder(order);
         setLuckyUsed(state.currentLuckyUsed || false);
         setLuckyByKidId(state.currentLuckyByKidId);
+        // Restore badge: a saved custom order means it was manually or lucky-reordered
+        setManuallyReordered(true);
         return;
       }
     }
@@ -47,7 +50,26 @@ export default function Home() {
     setCurrentOrder(order);
     setLuckyUsed(false);
     setLuckyByKidId(undefined);
+    setManuallyReordered(false);
   }, [kids, state?.rotationIndex, state?.currentOrder, state?.currentLuckyUsed]);
+
+  // Move a kid up or down in the manual order and persist to DB
+  const handleMove = async (index: number, direction: 'up' | 'down') => {
+    if (!state) return;
+    const swapIndex = direction === 'up' ? index - 1 : index + 1;
+    if (swapIndex < 0 || swapIndex >= currentOrder.length) return;
+
+    const newOrder = [...currentOrder];
+    [newOrder[index], newOrder[swapIndex]] = [newOrder[swapIndex], newOrder[index]];
+
+    const newOrderIds = newOrder.map(k => k.id);
+    await db.state.update('singleton', {
+      currentOrder: newOrderIds,
+      currentLuckyUsed: luckyUsed,
+      currentLuckyByKidId: luckyByKidId,
+    });
+    setManuallyReordered(true);
+  };
   
   const handleLucky = async (kidId: string) => {
     if (luckyUsed || !state) return;
@@ -76,7 +98,7 @@ export default function Home() {
   const handleLogSession = async () => {
     if (!state || currentOrder.length === 0) return;
 
-    // Logsession
+    // Log session
     await db.sessions.add({
       id: crypto.randomUUID(),
       timestamp: Date.now(),
@@ -88,10 +110,11 @@ export default function Home() {
     // Advance rotation, reset nightly state
     await db.state.update('singleton', {
       rotationIndex: (state.rotationIndex + 1) % kids.length,
-      currentOrder: undefined, // ensure this is undefined to trigger default next time
+      currentOrder: undefined,
       currentLuckyUsed: false,
       currentLuckyByKidId: undefined
     });
+    setManuallyReordered(false);
     
     const actionText = document.getElementById("action-text");
     if (actionText) {
@@ -120,6 +143,13 @@ export default function Home() {
       <div id="action-text" className="action-text comic-font" style={{ display: "none", position: "absolute", top: "30%", left: "50%", transform: "translate(-50%, -50%) rotate(-10deg) scale(2)", zIndex: 100 }}>
         POW!
       </div>
+
+      {/* Manual reorder hint */}
+      {manuallyReordered && (
+        <div className="manual-order-badge comic-font">
+          ✏️ Custom Order!
+        </div>
+      )}
       
       <div className="home-list">
           {currentOrder.map((kid, index) => {
@@ -140,6 +170,26 @@ export default function Home() {
                 <h3 className="kid-name">
                     {kid.name}
                 </h3>
+
+                {/* Up/Down reorder buttons */}
+                <div className="reorder-btns">
+                  <button
+                    className="button button-yellow reorder-btn"
+                    onClick={() => handleMove(index, 'up')}
+                    disabled={index === 0}
+                    aria-label={`Move ${kid.name} up`}
+                  >
+                    <ChevronUp size={20} />
+                  </button>
+                  <button
+                    className="button button-yellow reorder-btn"
+                    onClick={() => handleMove(index, 'down')}
+                    disabled={index === currentOrder.length - 1}
+                    aria-label={`Move ${kid.name} down`}
+                  >
+                    <ChevronDown size={20} />
+                  </button>
+                </div>
                 
                 {canRoll && (
                     <button className="button button-yellow icon-circle-btn" onClick={() => handleLucky(kid.id)} aria-label={`Lucky splash for ${kid.name}`}>
