@@ -413,3 +413,35 @@ h1, h2, h3, h4, .comic-font {
 .lucky-dice {
   font-size: 2rem;
 }
+
+/* Manual reorder controls */
+.reorder-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.reorder-btn {
+  font-size: 1rem;
+  padding: 0.3rem 0.4rem;
+  min-height: 0;
+  line-height: 1;
+}
+
+.reorder-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+.manual-order-badge {
+  background: var(--comic-yellow);
+  border: 3px solid var(--comic-black);
+  box-shadow: 3px 3px 0 var(--comic-black);
+  padding: 0.4rem 1rem;
+  font-size: 1.1rem;
+  transform: rotate(-2deg);
+  color: var(--comic-black);
+}
