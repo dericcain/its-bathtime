@@ -1,8 +1,8 @@
 "use client";
 
-import { db } from "@/lib/db";
+import { db, type AppState, type Kid } from "@/lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { AlertTriangle, CheckCircle, Dices } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowUp, CheckCircle, Dices, RotateCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 
 // Fisher-Yates shuffle
@@ -15,13 +15,35 @@ function shuffleArray<T>(array: T[]): T[] {
   return newArr;
 }
 
+function shuffleToDifferentOrder<T>(array: T[]): T[] {
+  if (array.length < 2) return [...array];
+
+  const shuffled = shuffleArray(array);
+  const unchanged = shuffled.every((item, index) => item === array[index]);
+
+  if (!unchanged) {
+    return shuffled;
+  }
+
+  return [...array.slice(1), array[0]];
+}
+
 export default function Home() {
-  const kids = useLiveQuery(() => db.kids.orderBy('createdAt').toArray()) || [];
-  const state = useLiveQuery(() => db.state.get('singleton'));
+  const kids = useLiveQuery(() => db.kids.orderBy("createdAt").toArray()) || [];
+  const state = useLiveQuery(() => db.state.get("singleton")) as AppState | undefined;
   
-  const [currentOrder, setCurrentOrder] = useState<any[]>([]);
+  const [currentOrder, setCurrentOrder] = useState<Kid[]>([]);
   const [luckyUsed, setLuckyUsed] = useState(false);
   const [luckyByKidId, setLuckyByKidId] = useState<string | undefined>();
+
+  const computeDefaultOrder = (kidsList: Kid[], rotationIndex: number) => {
+    if (kidsList.length === 0) return [];
+    const order: Kid[] = [];
+    for (let i = 0; i < kidsList.length; i++) {
+      order[i] = kidsList[(rotationIndex + i) % kidsList.length];
+    }
+    return order;
+  };
   
   // Calculate default order
   useEffect(() => {
@@ -29,7 +51,7 @@ export default function Home() {
     
     // If we have an existing session order saved in state, use it
     if (state.currentOrder && state.currentOrder.length === kids.length) {
-      const order = state.currentOrder.map(id => kids.find(k => k.id === id)!).filter(Boolean);
+      const order = state.currentOrder.map((id) => kids.find((k) => k.id === id)).filter(Boolean) as Kid[];
       if (order.length === kids.length) {
         setCurrentOrder(order);
         setLuckyUsed(state.currentLuckyUsed || false);
@@ -39,28 +61,28 @@ export default function Home() {
     }
     
     // Otherwise calculate default
-    const order = [];
-    const rotationIndex = state.rotationIndex || 0;
-    for (let i = 0; i < kids.length; i++) {
-        order[i] = kids[(rotationIndex + i) % kids.length];
-    }
-    setCurrentOrder(order);
+    setCurrentOrder(computeDefaultOrder(kids, state.rotationIndex || 0));
     setLuckyUsed(false);
     setLuckyByKidId(undefined);
-  }, [kids, state?.rotationIndex, state?.currentOrder, state?.currentLuckyUsed]);
+  }, [kids, state?.rotationIndex, state?.currentOrder, state?.currentLuckyUsed, state?.currentLuckyByKidId]);
   
   const handleLucky = async (kidId: string) => {
     if (luckyUsed || !state) return;
     
     // Shuffle all kids
-    const shuffled = shuffleArray(currentOrder);
+    const shuffled = shuffleToDifferentOrder(currentOrder);
+
+    // Update UI immediately (dexie update can be async / slightly delayed)
+    setCurrentOrder(shuffled);
+    setLuckyUsed(true);
+    setLuckyByKidId(kidId);
     
     const newOrderIds = shuffled.map(k => k.id);
-    await db.state.update('singleton', {
+    db.state.update("singleton", {
       currentOrder: newOrderIds,
       currentLuckyUsed: true,
       currentLuckyByKidId: kidId
-    });
+    }).catch(console.error);
     
     // Animate a bit by showing a SPLASH
     const actionText = document.getElementById("action-text");
@@ -113,6 +135,36 @@ export default function Home() {
       );
   }
 
+  const persistOrderIds = (order: Kid[]) => {
+    if (!state) return;
+    db.state
+      .update("singleton", { currentOrder: order.map((k) => k.id) })
+      .catch(console.error);
+  };
+
+  const moveKid = (index: number, direction: -1 | 1) => {
+    setCurrentOrder((prev) => {
+      const next = [...prev];
+      const target = index + direction;
+      if (target < 0 || target >= next.length) return prev;
+      [next[index], next[target]] = [next[target], next[index]];
+      persistOrderIds(next);
+      return next;
+    });
+  };
+
+  const resetOrder = async () => {
+    const next = computeDefaultOrder(kids, state.rotationIndex || 0);
+    setCurrentOrder(next);
+    setLuckyUsed(false);
+    setLuckyByKidId(undefined);
+    await db.state.update("singleton", {
+      currentOrder: undefined,
+      currentLuckyUsed: false,
+      currentLuckyByKidId: undefined,
+    });
+  };
+
   return (
     <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "2rem" }}>
       
@@ -122,6 +174,13 @@ export default function Home() {
       </div>
       
       <div className="home-list">
+          <div className="order-toolbar">
+            <div className="comic-font order-hint">Tap arrows to set tonight&apos;s order</div>
+            <button className="button button-yellow order-reset" onClick={resetOrder} aria-label="Reset order to default">
+              <RotateCcw size={20} />
+              <span style={{ marginLeft: "0.5rem" }}>Reset</span>
+            </button>
+          </div>
           {currentOrder.map((kid, index) => {
             const isSecond = index === 1;
             const canRoll = isSecond && !luckyUsed;
@@ -140,12 +199,32 @@ export default function Home() {
                 <h3 className="kid-name">
                     {kid.name}
                 </h3>
-                
-                {canRoll && (
-                    <button className="button button-yellow icon-circle-btn" onClick={() => handleLucky(kid.id)} aria-label={`Lucky splash for ${kid.name}`}>
-                        <Dices size={32} />
-                    </button>
-                )}
+
+                <div className="order-controls">
+                  {canRoll && (
+                      <button className="button button-yellow icon-circle-btn order-btn" onClick={() => handleLucky(kid.id)} aria-label={`I'm feeling lucky for ${kid.name}`}>
+                          <Dices size={28} />
+                      </button>
+                  )}
+                  <button
+                    className="button button-yellow icon-circle-btn order-btn"
+                    onClick={() => moveKid(index, -1)}
+                    disabled={index === 0}
+                    aria-label={`Move ${kid.name} up`}
+                    title="Move up"
+                  >
+                    <ArrowUp size={22} />
+                  </button>
+                  <button
+                    className="button button-yellow icon-circle-btn order-btn"
+                    onClick={() => moveKid(index, 1)}
+                    disabled={index === currentOrder.length - 1}
+                    aria-label={`Move ${kid.name} down`}
+                    title="Move down"
+                  >
+                    <ArrowDown size={22} />
+                  </button>
+                </div>
               </div>
             );
           })}
