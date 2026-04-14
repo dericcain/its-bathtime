@@ -166,7 +166,7 @@ export default function Home() {
   };
 
   return (
-    <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "2rem" }}>
+    <div className="home-screen">
       
       {/* Action Text Overlay */}
       <div id="action-text" className="action-text comic-font" style={{ display: "none", position: "absolute", top: "30%", left: "50%", transform: "translate(-50%, -50%) rotate(-10deg) scale(2)", zIndex: 100 }}>
