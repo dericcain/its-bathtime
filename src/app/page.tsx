@@ -203,7 +203,7 @@ export default function Home() {
                 <div className="order-controls">
                   {canRoll && (
                       <button className="button button-yellow icon-circle-btn order-btn" onClick={() => handleLucky(kid.id)} aria-label={`I'm feeling lucky for ${kid.name}`}>
-                          <Dices size={28} />
+                          <Dices size={34} />
                       </button>
                   )}
                   <button
@@ -213,7 +213,7 @@ export default function Home() {
                     aria-label={`Move ${kid.name} up`}
                     title="Move up"
                   >
-                    <ArrowUp size={22} />
+                    <ArrowUp size={30} />
                   </button>
                   <button
                     className="button button-yellow icon-circle-btn order-btn"
@@ -222,7 +222,7 @@ export default function Home() {
                     aria-label={`Move ${kid.name} down`}
                     title="Move down"
                   >
-                    <ArrowDown size={22} />
+                    <ArrowDown size={30} />
                   </button>
                 </div>
               </div>
